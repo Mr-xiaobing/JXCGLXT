@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="dao.GoodsDao">
+
+    <sql id="pagerWhere">
+        <where>
+            <if test="condition != null">
+<!--            根据商品名字查找商品-->
+                <if test="condition.goodsName != null">
+                   and goodsName like  concat('%',#{condition.goodsName},'%')
+                </if>
+<!--                根据标签查找商品 -->
+                <if test="condition.typeNo != null">
+                    and typeNo  = #{condition.typeNo}
+                </if>
+            </if>
+        </where>
+    </sql>
+
+    <insert id="add" >
+        insert into
+        goods(goodsName,typeNo,providerNo,specification,gRemark,mainImage)
+        values
+        (
+        #{goodsName},
+        #{typeNo},
+        #{providerNo},
+        #{specification},
+        #{gRemark},
+        #{mainImage}
+        )
+    </insert>
+
+    <update id="update">
+        update goods
+        <set>
+            <if test="goodsName != null">goodsName = #{goodsName},</if>
+            <if test="typeNo != null">typeNo = #{typeNo},</if>
+            <if test="providerNo != null">providerNo = #{providerNo},</if>
+            <if test="gRemark != null">gRemark = #{gRemark},</if>
+            <if test="specification != null">specification = #{gRemark},</if>
+            <if test="mainImage !=null">mainImage = #{mainImage},</if>
+        </set>
+        where  goodsNo = #{goodsNo}
+    </update>
+
+    <delete id="delete">
+        delete from goods where goodsNo=#{goodsNo}
+    </delete>
+
+    <select id="findByPager" parameterType="pojo.Pager" resultType="pojo.Goods">
+        select * from goods
+       <include refid="pagerWhere"></include>
+        <if test="start != null and size !=null">
+            limit #{start},#{size}
+        </if>
+
+    </select>
+
+    <select id="findTotalByPager" resultType="java.lang.Integer">
+
+        select count(*) from  goods
+        <include refid="pagerWhere"></include>
+    </select>
+
+</mapper>

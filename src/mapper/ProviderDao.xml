@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="dao.ProviderDao">
+
+    <sql id="pagerWhere">
+        <where>
+            <if test="condition != null">
+                <if test="condition.provider != null">
+                    and provider like concat('%',#{condition.provider},'%')
+                </if>
+                <if test="condition.pLinkman != null">
+                    and pLinkman like concat('%',#{condition.pLinkman},'%')
+                </if>
+            </if>
+        </where>
+    </sql>
+
+    <insert id="add">
+        insert into provider
+        (
+        provider,
+        pAddress,
+        pLinkman,
+        pEmail,
+        pPhone
+        )
+        values
+        (
+        #{provider},
+        #{pAddress},
+        #{pLinkman},
+        #{pEmail},
+        #{pPhone}
+        )
+    </insert>
+
+    <update id="update">
+    update provider
+    <set>
+        <if test="provider != null">provider = #{provider},</if>
+        <if test="pAddress != null">pAddress = #{pAddress},</if>
+        <if test="pLinkman != null">pLinkman = #{pLinkman},</if>
+        <if test="pEmail != null">pEmail = #{pEmail},</if>
+        <if test="pPhone != null">pPhone = #{pPhone}</if>
+    </set>
+    where #{providerNo} = providerNo
+    </update>
+
+    <delete id="delete">
+        delete from provider where providerNo = #{providerNo}
+    </delete>
+
+    <select id="findByPager" resultType="pojo.Provider">
+        select * from provider
+        <include refid="pagerWhere"></include>
+        <if test="start != null and size !=null">
+        limit #{start},#{size}
+        </if>
+    </select>
+
+    <select id="findTotalByPager" resultType="java.lang.Integer">
+        select count(*) from provider
+        <include refid="pagerWhere"></include>
+    </select>
+
+</mapper>

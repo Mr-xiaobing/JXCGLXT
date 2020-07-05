@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<!--进货的操作-->
+<mapper namespace="dao.StockInDao">
+
+    <sql id="pagerWhere">
+        <where>
+            <if test="condition != null">
+<!--            根据进货人进行查找进货单   -->
+                <if test="condition.handler != null">
+                    and handler like concat('%',#{condition.handler},'%')
+                </if>
+<!--                根据日期进行查找入货单      -->
+                <if test="condition.siDate != null">
+                    and date_format(siDate,'%Y-%m-%d') = date_format(#{condition.siDate},'%Y-%m-%d')
+                </if>
+<!--                查询某个仓库的所有入货单-->
+                <if test="condition.storageNo != null">
+                    and storageNo = #{condition.storageNo}
+                </if>
+<!--                查询某种种商品的所有进货单-->
+                <if test="condition.goodsNo !=null">
+                    and goodsNo = #{condition.goodsNo}
+                </if>
+            </if>
+        </where>
+    </sql>
+
+    <insert id="add">
+        insert into stock_in
+        (
+        storageNo,
+        goodsNo,
+        siQuantity,
+        siDate,
+        handler,
+        siRemark
+        )
+        values (
+        #{storageNo},
+        #{goodsNo},
+        #{siQuantity},
+        #{siDate},
+        #{handler},
+        #{siRemark}
+        )
+    </insert>
+
+    <update id="update">
+        update stock_in
+        <set>
+            <if test="storageNo !=null"> storageNo = #{storageNo},</if>
+            <if test="goodsNo !=null">goodsNo = #{goodsNo},</if>
+            <if test="siQuantity !=null">siQuantity = #{siQuantity},</if>
+            <if test="siDate !=null">siDate = #{siDate},</if>
+            <if test="handler !=null">handler = #{handler},</if>
+            <if test="siRemark !=null">siRemark = #{siRemark}</if>
+        </set>
+        where stockInNo =  #{stockInNo}
+    </update>
+
+    <delete id="delete">
+        delete from stock_in where  stockInNo = #{stockInNo}
+    </delete>
+
+    <select id="findByPager" resultType="pojo.StockIn">
+        select * from stock_in
+        <include refid="pagerWhere"></include>
+        <if test="start != null and size !=null">
+            limit #{start},#{size}
+        </if>
+    </select>
+
+    <select id="findTotalByPager" resultType="java.lang.Integer">
+        select count(*) from stock_in
+        <include refid="pagerWhere"></include>
+    </select>
+
+</mapper>

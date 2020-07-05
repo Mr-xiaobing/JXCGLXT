@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="dao.SalesDao">
+
+    <sql id="pagerWhere">
+        <where>
+            <if test="condition != null">
+                <if test="condition.handler != null">
+                    and handler like concat ('%',#{condition.handler},'%')
+                </if>
+                <if test="condition.dateSale">
+                    and date_format(dateSale,'%Y-%m-%d') =  date_format(#{condition.dateSale},'%Y-%m-%d')
+                </if>
+<!--                出售数量的大于-->
+                <if test="condition.quantitySale">
+                    and quantitySale > #{condition.quantitySale}
+                </if>
+            </if>
+        </where>
+    </sql>
+
+    <insert id="add">
+        insert into sales
+        (
+        goodsNo,
+        quantitySale,
+        priceSale,
+        dateSale,
+        handler,
+        clientNo,
+        sRemark,
+        storageNo
+        )
+        values
+        (
+        #{goodsNo},
+        #{quantitySale},
+        #{priceSale} ,
+        #{dateSale},
+        #{handler} ,
+        #{clientNo} ,
+        #{sRemark} ,
+        #{storageNo}
+        )
+    </insert>
+
+    <update id="update">
+        update sales
+        <set>
+            <if test="goodsNo != null">goodsNo = #{goodsNo} ,</if>
+            <if test="quantitySale != null"> quantitySale = #{quantitySale},</if>
+            <if test="priceSale != null">priceSale = #{priceSale},</if>
+            <if test="dateSale != null">dateSale = #{dateSale},</if>
+            <if test="handler != null"> handler = #{handler},</if>
+            <if test="clientNo != null">clientNo = #{clientNo},</if>
+            <if test="sRemark != null">sRemark = #{sRemark},</if>
+            <if test="storageNo != null">storageNo = #{storageNo}</if>
+        </set>
+         where  sNo = #{sNo}
+    </update>
+
+    <delete id="delete">
+        delete from sales where sNo = #{sNo}
+    </delete>
+
+    <select id="findByPager" resultType="pojo.Sales">
+        select * from sales
+        <include refid="pagerWhere"></include>
+        <if test="start != null and size !=null">
+            limit #{start},#{size}
+        </if>
+    </select>
+
+    <select id="findTotalByPager" resultType="java.lang.Integer">
+        select count(*) from sales
+        <include refid="pagerWhere"></include>
+    </select>
+
+</mapper>

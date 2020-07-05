@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="dao.PurchasingReturnDao">
+
+    <sql id="pagerWhere">
+        <where>
+            <if test="condition != null">
+                <if test="condition.handler != null">
+                    and handler like concat('%',#{condition.handler},'%')
+                </if>
+                <if test="condition.prDate != null">
+                    and date_format(prDate,'%Y-%m-%d') = date_format(#{prDate},'%Y-%m-%d')
+                </if>
+            </if>
+        </where>
+    </sql>
+
+    <insert id="add">
+        insert into purchasing_return
+        (
+        prNo,
+        goodsNo,
+        prQuantity,
+        prPrice,
+        prDate,
+        handler,
+        prRemark,
+        storageNo
+        )values
+        (
+        #{prNo},
+        #{goodsNo},
+        #{prQuantity},
+        #{prPrice},
+        #{prDate},
+        #{handler},
+        #{prRemark},
+        #{storageNo}
+        )
+    </insert>
+
+    <update id="update">
+        update purchasing_return
+       <set>
+           <if test="goodsNo != null"> goodsNo = #{goodsNo},</if>
+           <if test="prQuantity != null"> prQuantity =  #{prQuantity},</if>
+           <if test="prPrice != null"> prPrice = #{prPrice},</if>
+           <if test="prDate != null"> prDate= #{prDate},</if>
+           <if test="handler !=null">handler = #{handler},</if>
+           <if test="prRemark != null"> prRemark = #{prRemark},</if>
+            <if test="storageNo !=null">storageNo = #{storageNo}</if>
+       </set>
+       where prNo =  #{prNo}
+</update>
+
+    <delete id="delete">
+        delete from purchasing_return  where #{prNo} = prNo
+    </delete>
+
+    <select id="findByPager" resultType="pojo.PurchasingReturn">
+         select * from purchasing_return
+         <include refid="pagerWhere"></include>
+        <if test="start != null and size !=null">
+            limit #{start},#{size}
+        </if>
+    </select>
+
+    <select id="findTotalByPager" resultType="java.lang.Integer">
+         select count(*) from purchasing_return
+         <include refid="pagerWhere"></include>
+    </select>
+
+</mapper>

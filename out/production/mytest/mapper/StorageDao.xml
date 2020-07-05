@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="dao.StorageDao">
+
+    <sql id="pagerWhere">
+        <where>
+            <if test="condition != null">
+<!--            根据名字查找仓库-->
+                <if test="condition.storageName != null">
+                    and storageName like #{condition.storageName}
+                </if>
+<!--                根据位置查找仓库-->
+                <if test="condition.storageAddress != null">
+                    and storageAddress like #{condition.storageAddress}
+                </if>
+<!--               查询某个现有某个数量商品的工厂-->
+                <if test="condition.currentStorage != null">
+                    and currentStorage = #{condition.currentStorage}
+                </if>
+<!--                查询工厂容量-->
+                <if test="condition.capacity != null">
+                    and capacity = #{condition.capacity}
+                </if>
+            </if>
+        </where>
+    </sql>
+
+    <insert id="add">
+        insert into storage
+        (
+        storageName,
+        storageAddress,
+        capacity,
+        cordon,
+        currentStorage
+        )
+        values (
+        #{storageName},
+        #{storageAddress},
+        #{capacity},
+        #{cordon},
+        #{currentStorage}
+
+        )
+    </insert>
+
+    <update id="update">
+        update storage
+        <set>
+            <if test="storageName != null">storageName = #{storageName},</if>
+            <if test="storageAddress != null">storageAddress = #{storageAddress},</if>
+            <if test="capacity != null">capacity = #{capacity},</if>
+            <if test="cordon != null">cordon = #{cordon},</if>
+            <if test="currentStorage != null">currentStorage = #{currentStorage}</if>
+        </set>
+        where storageNo = #{storageNo}
+    </update>
+
+    <delete id="delete">
+        delete from storage where storageNo = #{storageNo}
+    </delete>
+
+    <select id="findByPager" resultType="pojo.Storage">
+        select * from storage
+        <include refid="pagerWhere"></include>
+        <if test="start != null and size !=null">
+            limit #{start},#{size}
+        </if>
+    </select>
+
+    <select id="findTotalByPager" resultType="java.lang.Integer">
+        select count(*) from storage
+        <include refid="pagerWhere"></include>
+    </select>
+
+</mapper>
